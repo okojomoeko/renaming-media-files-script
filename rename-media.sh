@@ -14,7 +14,7 @@ fi
 imgregex="jpg|png"
 vidregex="mp4|mov"
 
-filenames=$( find $1 -maxdepth 1 -type f  -regextype posix-egrep -regex ".*($imgregex|$vidregex)" )
+filenames=$( find $1 -maxdepth 1 -type f -regextype posix-egrep -iregex ".*($imgregex|$vidregex)" )
 
 count=1
 tempRenamedFile=""
@@ -23,9 +23,9 @@ for eachValue in $filenames; do
   ext=$( echo "$eachValue" | sed -e "s/.*\.//")
 
   prefix=""
-  if [[ $ext =~ $imgregex ]]; then
+  if [[ ${ext,,} =~ $imgregex ]]; then
     prefix="IMG"
-  elif [[ $ext =~ $vidregex ]]; then
+  elif [[ ${ext,,} =~ $vidregex ]]; then
     prefix="VID"
   fi
   current=$( dirname $eachValue)
