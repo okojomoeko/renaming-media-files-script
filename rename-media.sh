@@ -31,7 +31,7 @@ for eachValue in $filenames; do
   fi
   current=$( dirname $eachValue)
   # echo $eachValue
-  res=$(exiftool -api QuickTimeUTC -CreateDate "$eachValue")
+  res=$(exiftool -api QuickTimeUTC -api largefilesupport=1 -CreateDate "$eachValue")
   # echo $res
 
   timestamp=$( echo "$res" | sed -e "s/.*\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\) \([0-9]\{2\}\):\([0-9]\{2\}\):\([0-9]\{2\}\).*/\1\2\3_\4\5\6/")
