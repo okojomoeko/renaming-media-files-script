@@ -11,10 +11,11 @@ if !(type "exiftool" > /dev/null 2>&1); then
 fi
 
 
-imgregex="jpg|png"
+imgregex="jpg|png|hsp"
 vidregex="mp4|mov"
 
-filenames=$( find $1 -maxdepth 1 -type f -regextype posix-egrep -iregex ".*($imgregex|$vidregex)" )
+echo $1
+filenames=$( find $1 -maxdepth 1 -type f | grep -i -E ".*($imgregex|$vidregex)" )
 
 count=1
 tempRenamedFile=""
@@ -23,20 +24,19 @@ for eachValue in $filenames; do
   ext=$( echo "$eachValue" | sed -e "s/.*\.//")
 
   prefix=""
-  if [[ ${ext,,} =~ $imgregex ]]; then
+  if [ $( echo $ext | grep -i -E "$imgregex" ) ]; then
     prefix="IMG"
-  elif [[ ${ext,,} =~ $vidregex ]]; then
+  elif [ $( echo $ext | grep -i -E "$vidregex" ) ]; then
     prefix="VID"
   fi
   current=$( dirname $eachValue)
+  # echo $eachValue
+  res=$(exiftool -api QuickTimeUTC -api largefilesupport=1 -CreateDate "$eachValue")
+  # echo $res
 
-  res=$(exiftool -api QuickTimeUTC -CreateDate "$eachValue")
-
-  timestamp=$( echo "$res" | sed -e "s/.*\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\)\s\([0-9]\{2\}\):\([0-9]\{2\}\):\([0-9]\{2\}\).*/\1\2\3_\4\5\6/")
+  timestamp=$( echo "$res" | sed -e "s/.*\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\) \([0-9]\{2\}\):\([0-9]\{2\}\):\([0-9]\{2\}\).*/\1\2\3_\4\5\6/")
 
   dirname=$( echo "$timestamp" | sed -e "s/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\).*/\1-\2-\3/" )
-
-  echo $timestamp
 
   if [ ! -d "$current/$prefix/$dirname" ]; then
     mkdir -p "$current/$prefix/$dirname"
